@@ -1,0 +1,22 @@
+﻿h2 {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+}
+
+.btn {
+    width: 175px;
+    margin: 12px 6px 12px 0px;
+}
+
+.col-8, .col-4 {
+    padding-left: 0px;
+}
+
+.validationError {
+    color: red;
+    font-style: italic;
+}
+
+.alignCenter {
+    text-align: center;
+}

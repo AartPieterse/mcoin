@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Block Details";
+}
+
+@model UI.Webservice.Models.BlockModel;
+@{ int counter = 0; }
+
+<div>
+    <h2>@ViewData["Title"]: @Model.Hash</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">From address</th>
+                <th scope="col">To address</th>
+                <th scope="col">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in Model.Transactions)
+            {
+                counter++;
+
+                <tr>
+                    <th scope="row">@counter</th>
+                    <td>@transaction.FromAddress</td>
+                    <td>@transaction.ToAddress</td>
+                    <td>@transaction.Amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" asp-action="Overview" asp-controller="Blockchain">Back</a>
+</div>

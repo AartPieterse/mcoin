@@ -1,0 +1,53 @@
+﻿@{ 
+    ViewData["Title"] = "Pending transactions";
+}
+
+@model UI.Webservice.Models.TransactionModel;
+
+<div>
+    <h2 class="col-8">@ViewData["Title"]</h2>
+
+    <a class="btn btn-primary col-4 float-right" role="button" asp-action="AddBlock" asp-controller="Blockchain">Mine block</a>    
+
+    <p>
+        All pending transactions are shown here. <br />
+        Transactions can be added in the form.
+        To add the transactions to the blockchain, click on the Mine button.
+        The transactions will then be verified and saved inside a block.
+    </p>
+
+    <br />
+</div>
+
+<div>
+    <a class="btn btn-success" role="button" asp-action="AddTransaction" asp-controller="Transaction">Transfer</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>From Address</th>
+                <th>To Address</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.Transactions.Count == 0)
+            {
+                <tr>
+                    <td class="alignCenter" colspan="3">No pending transactions to show</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var t in ViewBag.Transactions)
+                {
+                    <tr>
+                        <td>@t.FromAddress</td>
+                        <td>@t.ToAddress</td>
+                        <td>@t.Amount</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

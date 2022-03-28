@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>
+        On this webpage all functions of a modern blockchain are visualized. <br />
+        In the Blockchain tab all blocks in the chain are shown. <br />
+        Under the Pending Transactions tab all pending transactions are shown. Also new transactions can be added here. <br /> 
+        By mining a block, all pending transactions will be put inside and a block which will be linked to the chain. <br />
+        Mining those blocks gives rewards in MoonCoin, which will be transferred to the miners wallet.
+    </p>
+
+    <p>
+        <i>Disclaimer: this a sandbox tool to help understand a blockchain and it is not a cryptocoin.</i>
+    </p>
+
+    <a class="btn btn-primary" asp-action="Overview" asp-controller="Blockchain" role="button">See Blockchain</a>
+</div>
+

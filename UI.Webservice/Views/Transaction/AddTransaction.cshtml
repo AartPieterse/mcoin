@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Send coins";
+}
+
+@model UI.Webservice.Models.TransactionModel;
+
+<div>
+    <h2>Transfer coins</h2>
+
+    <div class="card bg-light border-dark">
+        <div class="card-body">
+            <form asp-action="AddTransaction" method="post">
+                <div class="col-6 mb-2">
+                    <label class="form-label" asp-for="FromAddress">From Address:</label>
+                    <input class="form-control" asp-for="FromAddress" />
+                    <p class="validationError">@Html.ValidationMessageFor(t => t.FromAddress)</p>
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="form-label" asp-for="ToAddress">To Address: </label>
+                    <input class="form-control" asp-for="ToAddress" />
+                    <p class="validationError">@Html.ValidationMessageFor(t => t.ToAddress)</p>
+                </div>
+                <div class="col-6 mb-2">
+                    <label class="form-label" asp-for="Amount">Amount: </label>
+                    <input class="form-control" asp-for="Amount" />
+                    <p class="validationError">@Html.ValidationMessageFor(t => t.Amount)</p>
+                </div>
+                <div class="col-6 mb-2">
+                    <button class="btn btn-success" type="submit">Add</button>
+                    <a class="btn btn-danger" asp-action="Overview" asp-controller="Transaction">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
