@@ -9,23 +9,23 @@ using UI.Console.HTTP;
 namespace UI.Console
 {
     internal class Program
-    {
-        private const String FOLDERNAME = "Data";
-
-        private static readonly NodeSender s_sender = new NodeSender();
-
-        private static readonly IBlockRepository s_blockRepo = new BlockRepository(new BlockFileContext("BlockchainData", FOLDERNAME));
-        private static readonly IMempoolRepository s_mempoolRepo = new MempoolRepository(new MempoolFileContext("MempoolData", FOLDERNAME));
-        private static readonly IUTXORepository s_utxoRepo = new UTXORepository(new UTXOFileContext("UTXOData", FOLDERNAME));
-        private static readonly IWalletRepository s_walletRepo = new WalletRepository(new WalletFileContext("WalletData", FOLDERNAME));
-        private static readonly IAuthRepository s_authRepo = new AuthRepository(new AuthFileContext("Auth", FOLDERNAME));
+    {       
+        // Hardcoded for now, has to come from BlockchainData.txt
+        private static readonly Byte[] s_target = new Byte[4] { 0x1A, 0xFF, 0xFF, 0xFF };
+        private static readonly Int32 s_miningReward = 20;
 
         private static readonly Int32 s_version = 1;
         private static readonly Int32 s_txVersion = 1;
 
-        // Hardcoded for now, has to come from BlockchainData.txt
-        private static readonly Byte[] s_target = new Byte[4] { 0x1A, 0xFF, 0xFF, 0xFF };
-        private static readonly Int32 s_miningReward = 20;
+        private const String FOLDERNAME = "Data";
+
+        private static readonly NodeSender s_sender = new NodeSender();
+
+        private static readonly IBlockRepository s_blockRepo = new BlockRepository(new BlockFileContext("BlockchainData", FOLDERNAME, s_target, s_miningReward));
+        private static readonly IMempoolRepository s_mempoolRepo = new MempoolRepository(new MempoolFileContext("MempoolData", FOLDERNAME));
+        private static readonly IUTXORepository s_utxoRepo = new UTXORepository(new UTXOFileContext("UTXOData", FOLDERNAME));
+        private static readonly IWalletRepository s_walletRepo = new WalletRepository(new WalletFileContext("WalletData", FOLDERNAME));
+        private static readonly IAuthRepository s_authRepo = new AuthRepository(new AuthFileContext("Auth", FOLDERNAME));
 
         private static void Main(String[] args)
         {

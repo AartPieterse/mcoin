@@ -14,7 +14,10 @@ namespace Infrastructure
 
         private readonly String pathString;
 
-        public BlockFileContext(String pathName, String folderName)
+        private readonly byte[] target;
+        private readonly Int32 miningreward;
+
+        public BlockFileContext(String pathName, String folderName, byte[] target, Int32 miningreward)
         {
             this.pathString = Directory.GetCurrentDirectory().Substring(0, 40);
 
@@ -28,6 +31,10 @@ namespace Infrastructure
             {
                 File.Create(this.pathString);
             }
+
+
+            this.target = target;
+            this.miningreward = miningreward;
         }
 
         public Blockchain GetBlockchain()
@@ -53,6 +60,16 @@ namespace Infrastructure
             return null;
         }
 
+        public void SetupFile()
+        {
+            StreamWriter writer;
+            using (writer = new StreamWriter(this.pathString, true, Encoding.ASCII))
+            {
+                writer.WriteLine(BitConverter.ToString(target).Replace("-", ""));
+                writer.WriteLine(miningreward);
+            }
+        }
+
         public void AddBlock(Block block)
         {
             this.WriteFile(block);
@@ -66,12 +83,25 @@ namespace Infrastructure
             StreamReader reader;
             using (reader = new StreamReader(this.pathString, Encoding.ASCII))
             {
-                blockchain.Difficulty = this.StringToByteArray(reader.ReadLine());
+
+                string line = reader.ReadLine();
+
+                // if file is empty, write necessary information
+                if (line == null)
+                {
+                    reader.Close();
+
+                    this.SetupFile();
+
+                    reader = new StreamReader(this.pathString, Encoding.ASCII);
+
+                    line = reader.ReadLine();
+                }
+
+                blockchain.Difficulty = this.StringToByteArray(line);
                 blockchain.MiningReward = int.Parse(reader.ReadLine());
 
-                // if null, set-up new blockchain file
-
-                String line = reader.ReadLine();
+                line = reader.ReadLine();
                 while (line != null)
                 {
                     Block block = new Block();
