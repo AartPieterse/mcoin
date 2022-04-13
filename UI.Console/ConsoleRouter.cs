@@ -50,11 +50,11 @@ namespace UI.Console
                     case "wallet new":
                         this.CreateWallet();
                         break;
-                    case "tx show":
+                    case "tx show list":
                         this.ShowUTXOs();
                         break;
                     case "tx new":
-                        this.CreateTransaction();
+                        this.NewTransaction();
                         break;
                     case "show blockchain":
                         this.PrintBlockchain();
@@ -68,6 +68,7 @@ namespace UI.Console
                     case "exit":
                         this.Exit();
                         break;
+
                     default:
                         Printer.PrintText("Unknown command");
                         break;
@@ -116,7 +117,7 @@ namespace UI.Console
             this._txController.PrintUTXOs();
         }
 
-        private void CreateTransaction()
+        private void NewTransaction()
         {
             this._txController.NewTransaction();
         }

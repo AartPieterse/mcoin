@@ -20,7 +20,9 @@ namespace Infrastructure
             List<SubTx> strippedList = new List<SubTx>();
 
             if (address == null)
+            {
                 return list;
+            }
             else
             {
                 foreach (SubTx sub in list)

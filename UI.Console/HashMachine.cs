@@ -115,7 +115,7 @@ namespace UI.Console
             return hash;
         }
 
-        private static Byte[] CalculateHash(String input)
+        public static Byte[] CalculateHash(String input)
         {
             Byte[] bytes = new Byte[input.Length / 2];
             for (Int32 i = 0; i < input.Length; i += 2)

@@ -30,7 +30,7 @@ namespace UI.Console
                 " > wallet balance : gives the current balance in Mooncoin\n" +
                 " > wallet details : gives the details of the wallet\n" +
                 " > wallet new : deletes the current wallet and creates a new one\n" +
-                " > tx show : gives all unspent transactions\n" +
+                " > tx show list : gives all unspent transactions\n" +
                 " > tx new : creates a new transaction to another Mooncoin address\n" +
                 " > show blockchain : gives every block on the chain\n" +
                 " > show mempool : gives all pending transactions\n" +
@@ -103,7 +103,7 @@ namespace UI.Console
                 Printer.PrintText("===== Generated Outputs: ");
                 foreach (SubTx outSub in transaction.VOut)
                 {
-                    Printer.PrintText(" > TxID: {0}", BitConverter.ToString(outSub.TxHash).Replace("-", ""));
+                    //Printer.PrintText(" > TxID: {0}", BitConverter.ToString(outSub.TxHash).Replace("-", ""));
                     Printer.PrintText(" > OutItemNr: {0}", outSub.OutItemNr.ToString());
                     Printer.PrintText(" > InItemNr: {0}", outSub.InItemNr.ToString());
                     Printer.PrintText(" > Address: {0}", outSub.Address);

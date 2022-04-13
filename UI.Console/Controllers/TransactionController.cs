@@ -3,6 +3,7 @@ using Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace UI.Console.Controllers
 {
@@ -46,31 +47,35 @@ namespace UI.Console.Controllers
 
             char firstchar = address.First();
 
-            Printer.PrintText("Firstletter: ", firstchar);
+            Printer.PrintText("Creating new transaction...");
+            Thread.Sleep(1000);
 
             switch (firstchar)
             {
                 case '1':
-                    this.PayToPublicKeyHash();
+                    Printer.PrintText("You entered a Public Key Hash");
+                    this.PayToPublicKeyHash(address);
                     break;
                 case '3':
-                    this.PayToScriptHash();
+                    Printer.PrintText("You entered a Script Hash");
+                    this.PayToScriptHash(address);
+                    break;
+                case 'C':
+                    Printer.PrintText("You entered an x");
+                    this.SetupTransactionForm(address);
+                    break;
+
+                default:
+                    Printer.PrintText("Invalid address");
                     break;
             }
         }
 
-        public void PayToPublicKeyHash()
-        {
-            string base58 = "null";
-
-            // Get address
-            Printer.PrintText("Enter Public Key hash: ", '\n');
-
-            base58 = Printer.Listen();
-            
+        private void PayToPublicKeyHash(string address)
+        {            
             // Decode from base58
             byte[] pkh = null;
-            if (!Decode(base58, ref pkh))
+            if (!Decode(address, ref pkh))
             {
                 Printer.PrintText("Wrong Address");
 
@@ -85,23 +90,29 @@ namespace UI.Console.Controllers
                 return;
             }
 
-            Printer.PrintText("true");
+            this.SetupTransactionForm("abcdef");
         }
 
-        public void PayToScriptHash()
+        private void PayToScriptHash(string address)
         {
             Printer.PrintText("P2SH");
         }
 
-        public void NewTransaction1()
+        public void SetupTransactionForm(string address)
         {
             // sends a transaction
-
-            // asks for the address: 20-byte hash formatted using base58check
 
 
             string userAddress = this._walletRepo.GetWallet().PublicKey;
             List<SubTx> personalUtxoList = this._utxoRepo.GetAllUTXO(userAddress).ToList();
+
+            if (personalUtxoList.Count() == 0)
+            {
+                Printer.PrintText("Your wallet is empty. \n Aborting transaction...");
+                Thread.Sleep(1000);
+
+                return;
+            }
 
             Transaction newTx = new Transaction();
 
@@ -125,8 +136,8 @@ namespace UI.Console.Controllers
             // User created 1 output
             SubTx userOutput = new SubTx();
 
-            Printer.PrintText("Send to address: ");
-            userOutput.Address = Printer.Listen();
+            Printer.PrintText("Send to address: {0}", address);
+            userOutput.Address = address;
 
             Printer.PrintText("Send amount: ");
             userOutput.Amount = int.Parse(Printer.Listen());
@@ -171,6 +182,7 @@ namespace UI.Console.Controllers
             {
                 newTx
             };
+
             Printer.PrintTransactions(transactions);
 
             // Finalize
@@ -272,14 +284,16 @@ namespace UI.Console.Controllers
                 byte[] checksum = new byte[4] { source[^4], source[^3], source[^2], source[^1] };
 
                 // remove checksum from array
-                byte[] pk = new byte[source.Length - 4];
-                for (int i = 0; i < pk.Length; i++)
+                byte[] pkhWithoutChecksum = new byte[source.Length - 4];
+                for (int i = 0; i < pkhWithoutChecksum.Length; i++)
                 {
-                    pk[i] = source[i];
+                    pkhWithoutChecksum[i] = source[i];
                 }
 
+                source = pkhWithoutChecksum;
+
                 // double hash public key
-                byte[] firsthash  = HashMachine.CalculateHash(BitConverter.ToString(pk).Replace("-", ""));
+                byte[] firsthash  = HashMachine.CalculateHash(BitConverter.ToString(pkhWithoutChecksum).Replace("-", ""));
                 byte[] secondhash = HashMachine.CalculateHash(BitConverter.ToString(firsthash).Replace("-", ""));
 
                 byte[] firstbytes = new byte[4] { secondhash[0], secondhash[1], secondhash[2], secondhash[3] };
