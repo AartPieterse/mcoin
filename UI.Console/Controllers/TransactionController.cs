@@ -11,9 +11,9 @@ namespace UI.Console.Controllers
         private readonly IMempoolRepository _mempoolRepo;
         private readonly IUTXORepository _utxoRepo;
         private readonly IWalletRepository _walletRepo;
-        private readonly Int32 _version;
+        private readonly int _version;
 
-        public TransactionController(IMempoolRepository mempoolRepo, IUTXORepository utxoRepo, IWalletRepository walletRepo, Int32 version)
+        public TransactionController(IMempoolRepository mempoolRepo, IUTXORepository utxoRepo, IWalletRepository walletRepo, int version)
         {
             this._mempoolRepo = mempoolRepo;
             this._utxoRepo = utxoRepo;
@@ -23,7 +23,7 @@ namespace UI.Console.Controllers
 
         public void PrintUTXOs()
         {
-            String address = this._walletRepo.GetWallet().PublicKey;
+            string address = this._walletRepo.GetWallet().PublicKey;
 
             List<SubTx> utxoList = this._utxoRepo.GetAllUTXO(address).ToList();
 
@@ -40,7 +40,67 @@ namespace UI.Console.Controllers
 
         public void NewTransaction()
         {
-            String userAddress = this._walletRepo.GetWallet().PublicKey;
+            Printer.PrintText("Enter address: ");
+
+            string address = Printer.Listen();
+
+            char firstchar = address.First();
+
+            Printer.PrintText("Firstletter: ", firstchar);
+
+            switch (firstchar)
+            {
+                case '1':
+                    this.PayToPublicKeyHash();
+                    break;
+                case '3':
+                    this.PayToScriptHash();
+                    break;
+            }
+        }
+
+        public void PayToPublicKeyHash()
+        {
+            string base58 = "null";
+
+            // Get address
+            Printer.PrintText("Enter Public Key hash: ", '\n');
+
+            base58 = Printer.Listen();
+            
+            // Decode from base58
+            byte[] pkh = null;
+            if (!Decode(base58, ref pkh))
+            {
+                Printer.PrintText("Wrong Address");
+
+                return;
+            }
+
+            // Validate public key hash
+            if (!ValidateChecksum(ref pkh))
+            {
+                Printer.PrintText("Faulty address");
+
+                return;
+            }
+
+            Printer.PrintText("true");
+        }
+
+        public void PayToScriptHash()
+        {
+            Printer.PrintText("P2SH");
+        }
+
+        public void NewTransaction1()
+        {
+            // sends a transaction
+
+            // asks for the address: 20-byte hash formatted using base58check
+
+
+            string userAddress = this._walletRepo.GetWallet().PublicKey;
             List<SubTx> personalUtxoList = this._utxoRepo.GetAllUTXO(userAddress).ToList();
 
             Transaction newTx = new Transaction();
@@ -49,7 +109,7 @@ namespace UI.Console.Controllers
             Printer.PrintText("Enter some information to complete transaction");
 
             // Input
-            Int32 outputListCounter = 0;
+            int outputListCounter = 0;
             foreach (SubTx pUtxo in personalUtxoList)
             {
                 newTx.TotalInputValue += pUtxo.Amount;
@@ -78,22 +138,25 @@ namespace UI.Console.Controllers
 
             // Ask for fee
             Printer.PrintText("Pay fee: ");
-            Int32 fee = int.Parse(Printer.Listen());
+            int fee = int.Parse(Printer.Listen());
 
             // System created 1 return output
-            SubTx returnOutput = new SubTx();
-            returnOutput.Address = userAddress;
-            returnOutput.Amount = newTx.TotalInputValue - userOutput.Amount - fee;
-            returnOutput.InItemNr = -1;
-            returnOutput.OutItemNr = 1;
-            returnOutput.Signature = "xxxx";
-            returnOutput.Spendable = true;
+            SubTx returnOutput = new SubTx
+            {
+                Address = userAddress,
+                Amount = newTx.TotalInputValue - userOutput.Amount - fee,
+                InItemNr = -1,
+                OutItemNr = 1,
+                Signature = "xxxx",
+                Spendable = true
+            };
 
             // Add user-output, return-output, totaloutput, version and locktime to new transaction
-            List<SubTx> outputListForNewTx = new List<SubTx>();
-
-            outputListForNewTx.Add(userOutput);
-            outputListForNewTx.Add(returnOutput);
+            List<SubTx> outputListForNewTx = new List<SubTx>
+            {
+                userOutput,
+                returnOutput
+            };
             newTx.VOut = outputListForNewTx;
 
             newTx.Version = this._version;
@@ -104,40 +167,11 @@ namespace UI.Console.Controllers
             newTx.TotalOutputValue = userOutput.Amount + returnOutput.Amount;
 
             // Summary
-            List<Transaction> transactions = new List<Transaction>();
-            transactions.Add(newTx);
+            List<Transaction> transactions = new List<Transaction>
+            {
+                newTx
+            };
             Printer.PrintTransactions(transactions);
-
-
-            //Printer.PrintText("\nOverview: ");
-            //Printer.PrintText(" > Protocol version: {0}", newTx.Version);
-            //Printer.PrintText(" > Total input: {0} Mooncoin", newTx.TotalInputValue.ToString());
-            //Printer.PrintText(" > Spent output: {0}", newTx.TotalOutputValue.ToString());
-            //Printer.PrintText(" > Spent fees: {0}", fee);
-
-            //Printer.PrintText("===== Used unspent outputs");
-            //foreach (SubTx inSub in newTx.VIn)
-            //{
-            //    Printer.PrintText(" > TxID: {0}", BitConverter.ToString(inSub.TxHash).Replace("-", ""));
-            //    Printer.PrintText(" > OutItemNr: {0}", inSub.OutItemNr.ToString());
-            //    Printer.PrintText(" > InItemNr: {0}", inSub.InItemNr.ToString());
-            //    Printer.PrintText(" > Address: {0}", inSub.Address);
-            //    Printer.PrintText(" > Amount: {0} Mooncoin", inSub.Amount.ToString());
-            //    Printer.PrintText(" > Signature: {0}", inSub.Signature);
-            //}
-
-            //Printer.PrintText("===== Generated Outputs: ");
-            //foreach (SubTx outSub in newTx.VOut)
-            //{
-            //    Printer.PrintText(" > OutItemNr: {0}", outSub.OutItemNr.ToString());
-            //    Printer.PrintText(" > InItemNr: {0}", outSub.InItemNr.ToString());
-            //    Printer.PrintText(" > Address: {0}", outSub.Address);
-            //    Printer.PrintText(" > Amount: {0} Mooncoin", outSub.Amount.ToString());
-            //    Printer.PrintText(" > Signature: {0}", outSub.Signature);
-            //    Printer.PrintText(" == ");
-            //}
-
-            //Printer.PrintText(" > Locktime: {0}", newTx.LockTime.ToString());
 
             // Finalize
             Printer.PrintText("Type 'pay' to broadcast transaction");
@@ -147,7 +181,7 @@ namespace UI.Console.Controllers
                 newTx.Hash = HashMachine.CalculateTxHash(newTx);
 
                 // Set the Subtx hashes to the transaction hash
-                foreach(SubTx subtx in newTx.VOut)
+                foreach (SubTx subtx in newTx.VOut)
                 {
                     subtx.TxHash = newTx.Hash;
                 }
@@ -159,6 +193,111 @@ namespace UI.Console.Controllers
             {
                 Printer.PrintText("Transaction cancelled");
             }
+        }
+
+        public static bool Decode(string source, ref byte[] destination)
+        {
+            string Base58characters = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+            int i = 0;
+            while (i < source.Length)
+            {
+                if (source[i] == 0 || !char.IsWhiteSpace(source[i]))
+                {
+                    break;
+                }
+                i++;
+            }
+
+            int zeros = 0;
+            while (source[i] == '1')
+            {
+                zeros++;
+                i++;
+            }
+
+            byte[] b256 = new byte[(source.Length - i) * 733 / 1000 + 1];
+            while (i < source.Length && !char.IsWhiteSpace(source[i]))
+            {
+                int ch = Base58characters.IndexOf(source[i]);
+                if (ch == -1) //null
+                {
+                    return false;
+                }
+                int carry = Base58characters.IndexOf(source[i]);
+                for (int k = b256.Length - 1; k >= 0; k--)
+                {
+                    carry += 58 * b256[k];
+                    b256[k] = (byte)(carry % 256);
+                    carry /= 256;
+                }
+                i++;
+            }
+            while (i < source.Length && char.IsWhiteSpace(source[i]))
+            {
+                i++;
+            }
+            if (i != source.Length)
+            {
+                return false;
+            }
+
+            int j = 0;
+            while (j < b256.Length && b256[j] == 0)
+            {
+                j++;
+            }
+
+            destination = new byte[zeros + (b256.Length - j)];
+            for (int kk = 0; kk < destination.Length; kk++)
+            {
+                if (kk < zeros)
+                {
+                    destination[kk] = 0x00;
+                }
+                else
+                {
+                    destination[kk] = b256[j++];
+                }
+            }
+
+            return true;
+        }
+
+        public static bool ValidateChecksum(ref byte[] source)
+        {
+            try
+            {
+                // extract checksum
+                byte[] checksum = new byte[4] { source[^4], source[^3], source[^2], source[^1] };
+
+                // remove checksum from array
+                byte[] pk = new byte[source.Length - 4];
+                for (int i = 0; i < pk.Length; i++)
+                {
+                    pk[i] = source[i];
+                }
+
+                // double hash public key
+                byte[] firsthash  = HashMachine.CalculateHash(BitConverter.ToString(pk).Replace("-", ""));
+                byte[] secondhash = HashMachine.CalculateHash(BitConverter.ToString(firsthash).Replace("-", ""));
+
+                byte[] firstbytes = new byte[4] { secondhash[0], secondhash[1], secondhash[2], secondhash[3] };
+
+                // compare byte arrays
+                for(int i = 0; i < 4; i++)
+                {
+                    if (!(checksum[i] == firstbytes[i]))
+                        return false;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
         }
     }
 }
