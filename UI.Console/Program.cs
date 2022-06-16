@@ -19,8 +19,6 @@ namespace UI.Console
 
         private const String FOLDERNAME = "Data";
 
-        private static readonly NodeSender s_sender = new NodeSender();
-
         private static readonly IBlockRepository s_blockRepo = new BlockRepository(new BlockFileContext("BlockchainData", FOLDERNAME, s_target, s_miningReward));
         private static readonly IMempoolRepository s_mempoolRepo = new MempoolRepository(new MempoolFileContext("MempoolData", FOLDERNAME));
         private static readonly IUTXORepository s_utxoRepo = new UTXORepository(new UTXOFileContext("UTXOData", FOLDERNAME));
@@ -35,9 +33,7 @@ namespace UI.Console
             TransactionController transactionController = new TransactionController(s_mempoolRepo, s_utxoRepo, s_walletRepo, s_txVersion);
             WalletController walletController = new WalletController(s_walletRepo, s_utxoRepo);
 
-            Miner miner = new Miner(s_sender, null, s_mempoolRepo, s_utxoRepo, s_version, s_target, walletController.GetWallet(), s_miningReward);
-
-            ConsoleRouter router = new ConsoleRouter(authController, blockController, mempoolController, walletController, transactionController, miner);
+            ConsoleRouter router = new ConsoleRouter(authController, blockController, mempoolController, walletController, transactionController);
 
             authController.Authenticate();
 
