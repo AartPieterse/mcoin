@@ -15,7 +15,6 @@ namespace UI.Console.Controllers
         public void Authenticate()
         {
             String saved = this._authRepo.GetPassword();
-            String input;
 
             if (saved == null)
                 this.FirstPassword();
@@ -24,11 +23,14 @@ namespace UI.Console.Controllers
                 while (true)
                 {
                     Printer.PrintText("Enter password: ");
-                    input = Printer.Listen();
-                    if (!saved.Trim().Equals(input.Trim()))
-                        Printer.PrintText("Access denied");
-                    else
+                    string input = Printer.Listen();
+
+                    string hashString = HashMachine.CalculateSHA256FromString(input);
+
+                    if (HashMachine.AreHashStringsEqual(saved, hashString))
                         break;
+                    else
+                        Printer.PrintText("Access denied");
                 }
             }
         }
@@ -61,7 +63,10 @@ namespace UI.Console.Controllers
             if (input == input2)
             {
                 Printer.PrintText("Password set!\n");
-                this._authRepo.SavePassword(input);
+
+                string hashString = HashMachine.CalculateSHA256FromString(input);
+
+                this._authRepo.SavePassword(hashString);
                 return false;
             }
             else

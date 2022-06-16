@@ -130,5 +130,31 @@ namespace UI.Console
                 return hash;
             }
         }
+
+        public static string CalculateSHA256FromString(string input)
+        {
+            byte[] data;
+
+            using (SHA256 sha = SHA256.Create())
+            {
+                data = sha.ComputeHash(Encoding.UTF8.GetBytes(input));
+            }
+
+            var sBuilder = new StringBuilder();
+
+            for(int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            return sBuilder.ToString();
+        }
+
+        public static bool AreHashStringsEqual(string a, string b)
+        {
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+
+            return comparer.Compare(a, b) == 0;
+        }
     }
 }
