@@ -5,25 +5,15 @@ using System.Text;
 
 namespace Infrastructure
 {
-    public class WalletFileContext
+    public class WalletFileContext : FileContext
     {
         public Boolean HasWallet = false;
+
         private readonly String pathstring;
 
         public WalletFileContext(String pathName, String folderName)
         {
-            this.pathstring = Directory.GetCurrentDirectory().Substring(0, 40);
-
-            this.pathstring = Path.Combine(this.pathstring, folderName);
-
-            Directory.CreateDirectory(this.pathstring);
-
-            this.pathstring = Path.Combine(this.pathstring, pathName + ".txt");
-
-            if (!File.Exists(this.pathstring))
-            {
-                File.Create(this.pathstring);
-            }
+            this.pathstring = this.SetupFile(pathName, folderName);
         }
 
         public Wallet GetWallet()

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Infrastructure
 {
-    public class BlockFileContext
+    public class BlockFileContext : FileContext
     {
         private const String IN = "IN";
         private const String OUT = "OUT";
@@ -19,19 +19,7 @@ namespace Infrastructure
 
         public BlockFileContext(String pathName, String folderName, byte[] target, Int32 miningreward)
         {
-            this.pathString = Directory.GetCurrentDirectory().Substring(0, 40);
-
-            this.pathString = Path.Combine(this.pathString, folderName);
-
-            Directory.CreateDirectory(this.pathString);
-
-            this.pathString = Path.Combine(this.pathString, pathName + ".txt");
-
-            if (!File.Exists(this.pathString))
-            {
-                File.Create(this.pathString);
-            }
-
+            this.pathString = this.SetupFile(pathName, folderName);
 
             this.target = target;
             this.miningreward = miningreward;

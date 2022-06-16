@@ -24,7 +24,7 @@ namespace UI.Console
         private static readonly IBlockRepository s_blockRepo = new BlockRepository(new BlockFileContext("BlockchainData", FOLDERNAME, s_target, s_miningReward));
         private static readonly IMempoolRepository s_mempoolRepo = new MempoolRepository(new MempoolFileContext("MempoolData", FOLDERNAME));
         private static readonly IUTXORepository s_utxoRepo = new UTXORepository(new UTXOFileContext("UTXOData", FOLDERNAME));
-        private static readonly IWalletRepository s_walletRepo = new WalletRepository(new WalletFileContext("WalletData", FOLDERNAME));
+        private static readonly IWalletRepository s_walletRepo = new WalletRepository(new WalletFileContext("WalletData", FOLDERNAME));        
         private static readonly IAuthRepository s_authRepo = new AuthRepository(new AuthFileContext("Auth", FOLDERNAME));
 
         private static void Main(String[] args)
