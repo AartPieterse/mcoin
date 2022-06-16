@@ -11,16 +11,14 @@ namespace UI.Console
         private readonly MempoolController _mempoolController;
         private readonly TransactionController _txController;
         private readonly WalletController _walletController;
-        private readonly Miner _miner;
 
-        public ConsoleRouter(AuthController authController, BlockchainController blockchainController, MempoolController mempoolController, WalletController walletController, TransactionController txController, Miner miner)
+        public ConsoleRouter(AuthController authController, BlockchainController blockchainController, MempoolController mempoolController, WalletController walletController, TransactionController txController)
         {
             this._authController = authController;
             this._blockchainController = blockchainController;
             this._mempoolController = mempoolController;
             this._walletController = walletController;
             this._txController = txController;
-            this._miner = miner;
         }
 
         public void StartProcess()
@@ -39,34 +37,34 @@ namespace UI.Console
                         Help();
                         break;
                     case "mine":
-                        this.StartMiner();
+                        StartMiner();
                         break;
                     case "wallet balance":
-                        this.GetWalletBalance();
+                        GetWalletBalance();
                         break;
                     case "wallet details":
-                        this.GetWalletDetails();
+                        GetWalletDetails();
                         break;
                     case "wallet new":
-                        this.CreateWallet();
+                        CreateWallet();
                         break;
                     case "tx show list":
-                        this.ShowUTXOs();
+                        ShowUTXOs();
                         break;
                     case "tx new":
-                        this.NewTransaction();
+                        NewTransaction();
                         break;
                     case "show blockchain":
-                        this.PrintBlockchain();
+                        PrintBlockchain();
                         break;
                     case "show mempool":
-                        this.PrintMempool();
+                        PrintMempool();
                         break;
                     case "password new":
-                        this.SetPassword();
+                        SetPassword();
                         break;
                     case "exit":
-                        this.Exit();
+                        Exit();
                         break;
 
                     default:
@@ -81,14 +79,14 @@ namespace UI.Console
             Printer.PrintAvailableCommands();
         }
 
-        private void StartMiner()
+        private static void StartMiner()
         {
-            this._miner.Mine();
+            Miner.StartMinerProgram();
         }
 
         private void GetWalletBalance()
         {
-            Printer.PrintText("{0} Mooncoin", this._walletController.GetWallet().Balance.ToString());
+            Printer.PrintText("{0} Mooncoin", _walletController.GetWallet().Balance.ToString());
         }
 
         private void GetWalletDetails()
@@ -109,12 +107,12 @@ namespace UI.Console
 
         private void CreateWallet()
         {
-            this._walletController.SetupWallet();
+            _walletController.SetupWallet();
         }
 
         private void ShowUTXOs()
         {
-            this._txController.PrintUTXOs();
+            _txController.PrintUTXOs();
         }
 
         private void NewTransaction()
@@ -137,7 +135,7 @@ namespace UI.Console
             this._authController.SetNewPassword();
         }
 
-        private void Exit()
+        private static void Exit()
         {
             Printer.PrintText("\nGoodbye! \n\n");
 
