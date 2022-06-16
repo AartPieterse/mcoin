@@ -26,7 +26,7 @@ namespace Infrastructure
 
             Console.WriteLine(pathString);
 
-            if (!File.Exists(fileName)) File.Create(pathString).Close();
+            if (!File.Exists(pathString)) File.Create(pathString).Close();
 
             return pathString;
         }
