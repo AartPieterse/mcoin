@@ -44,43 +44,47 @@ namespace UI.Console.Controllers
             Printer.PrintText("Enter address: ");
 
             string address = Printer.Listen();
+            char firstchar = default;
 
-            if (AddressValidator.IsValidAddress(address))
+            try
             {
-                char firstchar = address.First();
-
-                Printer.PrintText("Creating new transaction...");
-                Thread.Sleep(1000);
-
-                switch (firstchar)
+                if (AddressValidator.IsValidAddress(address))
                 {
-                    case '1':
-                        Printer.PrintText("You entered a Public Key Hash");
-                        this.PayToPublicKeyHash(address);
-                        break;
-                    case '3':
-                        Printer.PrintText("You entered a Script Hash");
-                        this.PayToScriptHash(address);
-                        break;
-                    case 'C':
-                        Printer.PrintText("You entered an x");
-                        this.SetupTransactionForm(address);
-                        break;
-
-                    default:
-                        Printer.PrintText("Invalid address");
-                        break;
+                    firstchar = address.First();
                 }
-
-            } else {
-
-                Printer.PrintText("Invalid address \n Transaction aborted");
+                else
+                {
+                    Printer.PrintText("Invalid address \n Transaction aborted");
+                }
+            }
+            catch (Exception e)
+            {
+                Printer.PrintText(e.Message);
             }
 
+            switch (firstchar)
+            {
+                case '1':
+                    Printer.PrintText("You entered a Public Key Hash");
+                    this.PayToPublicKeyHash(address);
+                    break;
+                case '3':
+                    Printer.PrintText("You entered a Script Hash");
+                    this.PayToScriptHash(address);
+                    break;
+                case 'C':
+                    Printer.PrintText("You entered an x");
+                    this.SetupTransactionForm(address);
+                    break;
+
+                default:
+                    Printer.PrintText("Invalid address");
+                    break;
+            }
         }
 
         private void PayToPublicKeyHash(string address)
-        {            
+        {
             // Decode from base58
             byte[] pkh = null;
             if (!Decode(address, ref pkh))
@@ -114,7 +118,7 @@ namespace UI.Console.Controllers
             string userAddress = this._walletRepo.GetWallet().PublicKey;
             List<SubTx> personalUtxoList = this._utxoRepo.GetAllUTXO(userAddress).ToList();
 
-            if (personalUtxoList.Count() == 0)
+            if (personalUtxoList.Count == 0)
             {
                 Printer.PrintText("Your wallet is empty. \n Aborting transaction...");
                 Thread.Sleep(1000);
@@ -301,13 +305,13 @@ namespace UI.Console.Controllers
                 source = pkhWithoutChecksum;
 
                 // double hash public key
-                byte[] firsthash  = HashMachine.CalculateHash(BitConverter.ToString(pkhWithoutChecksum).Replace("-", ""));
+                byte[] firsthash = HashMachine.CalculateHash(BitConverter.ToString(pkhWithoutChecksum).Replace("-", ""));
                 byte[] secondhash = HashMachine.CalculateHash(BitConverter.ToString(firsthash).Replace("-", ""));
 
                 byte[] firstbytes = new byte[4] { secondhash[0], secondhash[1], secondhash[2], secondhash[3] };
 
                 // compare byte arrays
-                for(int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     if (!(checksum[i] == firstbytes[i]))
                         return false;

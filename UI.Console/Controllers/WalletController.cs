@@ -57,7 +57,7 @@ namespace UI.Console.Controllers
 
         public Wallet GetWallet()
         {
-            this.RecalculateBalance();
+            //this.RecalculateBalance();
 
             return this._userWallet;
         }
