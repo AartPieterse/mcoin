@@ -45,30 +45,38 @@ namespace UI.Console.Controllers
 
             string address = Printer.Listen();
 
-            char firstchar = address.First();
-
-            Printer.PrintText("Creating new transaction...");
-            Thread.Sleep(1000);
-
-            switch (firstchar)
+            if (AddressValidator.IsValidAddress(address))
             {
-                case '1':
-                    Printer.PrintText("You entered a Public Key Hash");
-                    this.PayToPublicKeyHash(address);
-                    break;
-                case '3':
-                    Printer.PrintText("You entered a Script Hash");
-                    this.PayToScriptHash(address);
-                    break;
-                case 'C':
-                    Printer.PrintText("You entered an x");
-                    this.SetupTransactionForm(address);
-                    break;
+                char firstchar = address.First();
 
-                default:
-                    Printer.PrintText("Invalid address");
-                    break;
+                Printer.PrintText("Creating new transaction...");
+                Thread.Sleep(1000);
+
+                switch (firstchar)
+                {
+                    case '1':
+                        Printer.PrintText("You entered a Public Key Hash");
+                        this.PayToPublicKeyHash(address);
+                        break;
+                    case '3':
+                        Printer.PrintText("You entered a Script Hash");
+                        this.PayToScriptHash(address);
+                        break;
+                    case 'C':
+                        Printer.PrintText("You entered an x");
+                        this.SetupTransactionForm(address);
+                        break;
+
+                    default:
+                        Printer.PrintText("Invalid address");
+                        break;
+                }
+
+            } else {
+
+                Printer.PrintText("Invalid address \n Transaction aborted");
             }
+
         }
 
         private void PayToPublicKeyHash(string address)
